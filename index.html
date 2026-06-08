@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anama Sürpriz ❤️</title>
+    <!-- Konfeti kitabxanası -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -37,10 +39,9 @@
             z-index: 10;
         }
 
-        /* images qovluğundakı uşaqlıq şəkli üçün dizayn */
         .profile-img {
-            width: 130px;
-            height: 130px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid #ffd3d3;
@@ -56,21 +57,57 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 8px 20px rgba(214, 48, 49, 0.1); }
-            50% { transform: scale(1.04); box-shadow: 0 8px 25px rgba(214, 48, 49, 0.2); }
-            100% { transform: scale(1); box-shadow: 0 8px 20px rgba(214, 48, 49, 0.1); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+            100% { transform: scale(1); }
         }
 
         h2 {
             color: #2d3436;
-            font-size: 21px;
+            font-size: 20px;
             font-weight: 600;
             line-height: 1.4;
-            margin-bottom: 35px;
+            margin-bottom: 25px;
             min-height: 65px;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* Slayder və Kart Paneli üçün stillər */
+        .slider-container, .card-container {
+            display: none;
+            margin-bottom: 25px;
+            background: #fff5f5;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px dashed #ffb3b3;
+        }
+
+        .slider-label {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d63031;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-top: 10px;
+            accent-color: #2ecc71;
+        }
+
+        .card-number {
+            font-family: monospace;
+            font-size: 18px;
+            letter-spacing: 2px;
+            background: #f1f2f6;
+            padding: 10px;
+            border-radius: 8px;
+            display: block;
+            margin-bottom: 10px;
+            color: #2d3436;
         }
 
         .btn-container {
@@ -86,61 +123,68 @@
         button {
             padding: 14px 0;
             width: 120px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             border: none;
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: all 0.2s;
         }
 
         .btn-yes {
             background-color: #2ecc71;
             color: white;
-            transition: transform 0.1s, background-color 0.2s;
         }
 
-        .btn-yes:active {
-            transform: scale(0.92);
-            background-color: #27ae60;
-        }
+        .btn-yes:active { transform: scale(0.92); }
 
         .btn-no {
             background-color: #dfe6e9;
             color: #636e72;
             position: absolute;
             left: 55%;
-            transition: background-color 0.2s;
-            will-change: top, left;
             touch-action: none;
         }
 
+        .btn-copy {
+            background-color: #3498db;
+            color: white;
+            width: 80%;
+            margin: 0 auto;
+            display: none;
+        }
+
         @media (max-width: 480px) {
-            h2 {
-                font-size: 18px;
-            }
-            button {
-                width: 105px;
-                padding: 12px 0;
-                font-size: 16px;
-            }
-            .profile-img {
-                width: 110px;
-                height: 110px;
-            }
+            h2 { font-size: 18px; }
+            button { width: 105px; font-size: 15px; }
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <!-- Şəkil yolu images/img45.jpeg olaraq yeniləndi -->
         <img src="images/img45.jpeg" alt="Anam və mən" class="profile-img">
         <span class="emoji" id="emoji">👩‍👦❤️</span>
         <h2 id="question">Canım anam, bu dünyada məni hamıdan çox istəyən sənSƏN, düzdür? 🥰</h2>
+        
+        <!-- Gizli Slayder Bölməsi -->
+        <div class="slider-container" id="sliderContainer">
+            <p style="font-size: 14px; color: #636e72;">Könlündən qopan məbləği seç (Yalnız artırmaq olar 😜):</p>
+            <input type="range" id="moneySlider" min="20" max="100" value="20" step="5">
+            <span class="slider-label" id="sliderValue">20 AZN</span>
+        </div>
+
+        <!-- Gizli Kart Kopyalama Bölməsi -->
+        <div class="card-container" id="cardContainer">
+            <span class="card-number" id="cardNumber">4098 5844 5022 1112</span>
+            <p id="copyStatus" style="font-size: 12px; color: #2ecc71; font-weight: bold; min-height: 18px;"></p>
+        </div>
+
         <div class="btn-container">
             <button class="btn-yes" id="yesBtn">Hə düzdür</button>
             <button class="btn-no" id="noBtn">Yox</button>
+            <button class="btn-copy" id="copyBtn">Nömrəni Kopyala</button>
         </div>
     </div>
 
@@ -150,17 +194,35 @@
             { question: "Gecələr oyaq qalıb, mənə min bir zəhmətlə baxmısan, haqqın ödənməz... 🥺", emoji: "✨🙏✨" },
             { question: "Yaxşı, bəs böyüdüb boya-başa çatdırdığın bu ağıllı övladın fəxrindir? 😎", emoji: "👑" },
             { question: "İndi bu boyda fəxr olunası övladın səndən bir azca cib xərcliyi istəsə, yəqin ki, yox deməzsən? 😉👉👈", emoji: "💵" },
-            { question: "Məsələn, elə də çox yox, cəmi bircə dənə 20 manatcıq... Verərsən bir dənə? 💸😂", emoji: "🤔" },
-            { question: "Ay canım mənim! Razılaşdıq o zaman, nağd yoxsa karta göndərirsən? 🥳💰", emoji: "🚀🛍️" }
+            { question: "Sənə tam layiq olsun deyilə, məbləği seçməyi sənə buraxıram. Nə qədər göndərirsən? 💸", emoji: "📊", showSlider: true },
+            { question: "Ay canım mənim! Razılaşdıq o zaman, transferi təsdiqləyirik? 🥳💰", emoji: "🚀🛍️" }
         ];
 
         let currentStep = 0;
+        let noScale = 1; // "Yox" düyməsinin ilkin miqyası
 
         const questionTxt = document.getElementById('question');
         const emojiTxt = document.getElementById('emoji');
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const sliderContainer = document.getElementById('sliderContainer');
+        const cardContainer = document.getElementById('cardContainer');
+        const moneySlider = document.getElementById('moneySlider');
+        const sliderValue = document.getElementById('sliderValue');
+        const cardNumber = document.getElementById('cardNumber');
+        const copyStatus = document.getElementById('copyStatus');
 
+        // Slayder hərəkət edəndə dəyəri yenilə
+        moneySlider.addEventListener('input', (e) => {
+            // Əgər hiylə işlədib 20-dən aşağı çəkmək istəsə (html min="20" qorusa da, JS ilə də mütləq kilidləyirik)
+            if(e.target.value < 20) {
+                e.target.value = 20;
+            }
+            sliderValue.innerText = e.target.value + " AZN";
+        });
+
+        // "Yox" düyməsini həm qaçıran, həm də kiçildən funksiya
         function moveNoButton(e) {
             if (e) e.preventDefault();
 
@@ -171,31 +233,75 @@
             const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
             const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
 
+            // Hər cəhddə düyməni 15% kiçildirik
+            noScale = Math.max(0.3, noScale - 0.15); 
+            
             noBtn.style.position = 'fixed';
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
+            noBtn.style.transform = `scale(${noScale})`;
         }
 
         noBtn.addEventListener('mouseover', moveNoButton);
         noBtn.addEventListener('touchstart', moveNoButton, { passive: false });
         noBtn.addEventListener('mousedown', moveNoButton);
 
+        // "Hə" düyməsi
         yesBtn.addEventListener('click', () => {
             currentStep++;
+
+            // Slayder mərhələsinin idarə olunması
+            if (currentStep < steps.length && steps[currentStep].showSlider) {
+                sliderContainer.style.display = 'block';
+            } else {
+                sliderContainer.style.display = 'none';
+            }
 
             if (currentStep < steps.length) {
                 questionTxt.innerText = steps[currentStep].question;
                 emojiTxt.innerText = steps[currentStep].emoji;
                 
+                // "Yox" düyməsini sıfırlayıb yerinə qaytarırıq
+                noScale = 1;
                 noBtn.style.position = 'absolute';
                 noBtn.style.left = '55%';
                 noBtn.style.top = 'auto';
+                noBtn.style.transform = 'scale(1)';
+
+                confetti({ particleCount: 30, spread: 40, origin: { y: 0.8 } });
             } else {
-                questionTxt.innerHTML = "Mənim xeyirxah, ürəyi yumşaq anam! <br> 20 manatlıq transfer qəbul olundu, gözləyirəm! 😂❤️🎉";
-                emojiTxt.innerText = "💌💎💸";
+                // Final Ekranı
+                const finalAmount = moneySlider.value;
+                questionTxt.innerHTML = `Mənim xeyirxah, ürəyi yumşaq anam! <br> <span style="color:#2ecc71;">${finalAmount} AZN</span>-lik transfer təsdiqləndi! 😂❤️🎉`;
+                emojiTxt.innerText = "💌💸💎";
+                
                 yesBtn.style.display = 'none';
                 noBtn.style.display = 'none';
+                
+                // Kart panelini və kopyalama düyməsini aktivləşdir
+                cardContainer.style.display = 'block';
+                copyBtn.style.display = 'block';
+
+                // Böyük konfeti şousu
+                var duration = 2.5 * 1000;
+                var end = Date.now() + duration;
+                (function frame() {
+                    confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 } });
+                    confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 } });
+                    if (Date.now() < end) { requestAnimationFrame(frame); }
+                }());
             }
+        });
+
+        // Kart Kopyalama Funksiyası
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = cardNumber.innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyStatus.innerText = "📋 Kart nömrəsi uğurla kopyalandı! İndi mənə göndərə bilərsən 😉";
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+            }).catch(() => {
+                copyStatus.innerText = "Xəta baş verdi, nömrəni özün yazarsan 😂";
+            });
         });
     </script>
 
