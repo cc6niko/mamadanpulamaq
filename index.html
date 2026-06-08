@@ -37,7 +37,7 @@
             z-index: 10;
         }
 
-        /* Sabit qalan uşaqlıq şəkli */
+        /* images qovluğundakı uşaqlıq şəkli üçün dizayn */
         .profile-img {
             width: 130px;
             height: 130px;
@@ -134,8 +134,8 @@
 <body>
 
     <div class="card">
-        <!-- Şəkliniz hər addımda yuxarıda sabit qalır -->
-        <img src="img45.jpeg" alt="Anam və mən" class="profile-img">
+        <!-- Şəkil yolu images/img45.jpeg olaraq yeniləndi -->
+        <img src="images/img45.jpeg" alt="Anam və mən" class="profile-img">
         <span class="emoji" id="emoji">👩‍👦❤️</span>
         <h2 id="question">Canım anam, bu dünyada məni hamıdan çox istəyən sənSƏN, düzdür? 🥰</h2>
         <div class="btn-container">
@@ -145,7 +145,6 @@
     </div>
 
     <script>
-        // Tamamilə 20 manata kilidlənlmiş səmimi dialoq ssenarisi
         const steps = [
             { question: "Canım anam, bu dünyada məni hamıdan çox istəyən sənSƏN, düzdür? 🥰", emoji: "👩‍👦❤️" },
             { question: "Gecələr oyaq qalıb, mənə min bir zəhmətlə baxmısan, haqqın ödənməz... 🥺", emoji: "✨🙏✨" },
@@ -162,7 +161,6 @@
         const yesBtn = document.getElementById('yesBtn');
         const noBtn = document.getElementById('noBtn');
 
-        // "Yox" düyməsini həm mobildə, həm PC-də dərhal qaçıran funksiya
         function moveNoButton(e) {
             if (e) e.preventDefault();
 
@@ -182,7 +180,6 @@
         noBtn.addEventListener('touchstart', moveNoButton, { passive: false });
         noBtn.addEventListener('mousedown', moveNoButton);
 
-        // "Hə" düyməsinə klik addımları
         yesBtn.addEventListener('click', () => {
             currentStep++;
 
@@ -190,12 +187,10 @@
                 questionTxt.innerText = steps[currentStep].question;
                 emojiTxt.innerText = steps[currentStep].emoji;
                 
-                // "Yox" düyməsini növbəti sualda ilkin yerinə qaytarırıq
                 noBtn.style.position = 'absolute';
                 noBtn.style.left = '55%';
                 noBtn.style.top = 'auto';
             } else {
-                // Pul təsdiqlənəndən sonrakı final ekranı
                 questionTxt.innerHTML = "Mənim xeyirxah, ürəyi yumşaq anam! <br> 20 manatlıq transfer qəbul olundu, gözləyirəm! 😂❤️🎉";
                 emojiTxt.innerText = "💌💎💸";
                 yesBtn.style.display = 'none';
