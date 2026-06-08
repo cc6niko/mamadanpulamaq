@@ -76,7 +76,6 @@
 
         /* Slayder və Kart Paneli üçün stillər */
         .slider-container, .card-container {
-            display: none;
             margin-bottom: 25px;
             background: #fff5f5;
             padding: 15px;
@@ -84,8 +83,16 @@
             border: 1px dashed #ffb3b3;
         }
 
+        .slider-container {
+            display: block; /* İlk başda görünür */
+        }
+
+        .card-container {
+            display: none;
+        }
+
         .slider-label {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
             color: #d63031;
             display: block;
@@ -145,6 +152,7 @@
             position: absolute;
             left: 55%;
             touch-action: none;
+            display: none; /* İlk mərhələdə "Yox" düyməsi gizlidir, suallarda çıxacaq */
         }
 
         .btn-copy {
@@ -165,41 +173,42 @@
 
     <div class="card">
         <img src="images/img45.jpeg" alt="Anam və mən" class="profile-img">
-        <span class="emoji" id="emoji">👩‍👦❤️</span>
-        <h2 id="question">Canım anam, bu dünyada məni hamıdan çox istəyən sənSƏN, düzdür? 🥰</h2>
+        <span class="emoji" id="emoji">📊💸</span>
+        <h2 id="question">Canım anam, ilk öncə könlündən qopan cib xərcliyini seç görək... 🥰</h2>
         
-        <!-- Gizli Slayder Bölməsi -->
+        <!-- Slayder Bölməsi (Ən Başda) -->
         <div class="slider-container" id="sliderContainer">
-            <p style="font-size: 14px; color: #636e72;">Könlündən qopan məbləği seç (Yalnız artırmaq olar 😜):</p>
+            <p style="font-size: 14px; color: #636e72;">Məbləğ (Yalnız artırmaq olar, aşağı düşmür 😜):</p>
             <input type="range" id="moneySlider" min="20" max="100" value="20" step="5">
             <span class="slider-label" id="sliderValue">20 AZN</span>
         </div>
 
-        <!-- Gizli Kart Kopyalama Bölməsi -->
+        <!-- Gizli Kart Kopyalama Bölməsi (Ən Sonda) -->
         <div class="card-container" id="cardContainer">
-            <span class="card-number" id="cardNumber">4098 5844 5022 1112</span>
+            <!-- Bura öz real kart nömrəni yaza bilərsən -->
+            <span class="card-number" id="cardNumber">4169 0000 0000 0000</span>
             <p id="copyStatus" style="font-size: 12px; color: #2ecc71; font-weight: bold; min-height: 18px;"></p>
         </div>
 
         <div class="btn-container">
-            <button class="btn-yes" id="yesBtn">Hə düzdür</button>
+            <button class="btn-yes" id="yesBtn">İrəli ➡️</button>
             <button class="btn-no" id="noBtn">Yox</button>
             <button class="btn-copy" id="copyBtn">Nömrəni Kopyala</button>
         </div>
     </div>
 
     <script>
+        // Suallar artıq slayderdən SONRA başlayır
         const steps = [
-            { question: "Canım anam, bu dünyada məni hamıdan çox istəyən sənSƏN, düzdür? 🥰", emoji: "👩‍👦❤️" },
-            { question: "Gecələr oyaq qalıb, mənə min bir zəhmətlə baxmısan, haqqın ödənməz... 🥺", emoji: "✨🙏✨" },
-            { question: "Yaxşı, bəs böyüdüb boya-başa çatdırdığın bu ağıllı övladın fəxrindir? 😎", emoji: "👑" },
-            { question: "İndi bu boyda fəxr olunası övladın səndən bir azca cib xərcliyi istəsə, yəqin ki, yox deməzsən? 😉👉👈", emoji: "💵" },
-            { question: "Sənə tam layiq olsun deyilə, məbləği seçməyi sənə buraxıram. Nə qədər göndərirsən? 💸", emoji: "📊", showSlider: true },
-            { question: "Ay canım mənim! Razılaşdıq o zaman, transferi təsdiqləyirik? 🥳💰", emoji: "🚀🛍️" }
+            { question: "Canım anam, bu dünyada məni hamıdan çox istəyən sənSƏN, düzdür? 🥰", emoji: "👩‍👦❤️", showNoBtn: true },
+            { question: "Gecələr oyaq qalıb, mənə min bir zəhmətlə baxmısan, haqqın ödənməz... 🥺", emoji: "✨🙏✨", showNoBtn: true },
+            { question: "Yaxşı, bəs böyüdüb boya-başa çatdırdığın bu ağıllı övladın fəxrindir? 😎", emoji: "👑", showNoBtn: true },
+            { question: "İndi bu boyda fəxr olunası övladın səndən bayaq seçdiyin o kiçik məbləği istəsə, yox deməzsən hər halda? 😉👉👈", emoji: "💵", showNoBtn: true },
+            { question: "Ay canım mənim! Razılaşdıq o zaman, transferi təsdiqləyirik? 🥳💰", emoji: "🚀🛍️", showNoBtn: true }
         ];
 
-        let currentStep = 0;
-        let noScale = 1; // "Yox" düyməsinin ilkin miqyası
+        let currentStep = -1; // -1 slayder mərhələsini bildirir
+        let noScale = 1;
 
         const questionTxt = document.getElementById('question');
         const emojiTxt = document.getElementById('emoji');
@@ -213,16 +222,13 @@
         const cardNumber = document.getElementById('cardNumber');
         const copyStatus = document.getElementById('copyStatus');
 
-        // Slayder hərəkət edəndə dəyəri yenilə
+        // Slayder tənzimləməsi
         moneySlider.addEventListener('input', (e) => {
-            // Əgər hiylə işlədib 20-dən aşağı çəkmək istəsə (html min="20" qorusa da, JS ilə də mütləq kilidləyirik)
-            if(e.target.value < 20) {
-                e.target.value = 20;
-            }
+            if(e.target.value < 20) e.target.value = 20;
             sliderValue.innerText = e.target.value + " AZN";
         });
 
-        // "Yox" düyməsini həm qaçıran, həm də kiçildən funksiya
+        // "Yox" düyməsini qaçıran və kiçildən funksiya
         function moveNoButton(e) {
             if (e) e.preventDefault();
 
@@ -233,7 +239,6 @@
             const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
             const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
 
-            // Hər cəhddə düyməni 15% kiçildirik
             noScale = Math.max(0.3, noScale - 0.15); 
             
             noBtn.style.position = 'fixed';
@@ -246,31 +251,33 @@
         noBtn.addEventListener('touchstart', moveNoButton, { passive: false });
         noBtn.addEventListener('mousedown', moveNoButton);
 
-        // "Hə" düyməsi
+        // "Hə" və ya "İrəli" düyməsi
         yesBtn.addEventListener('click', () => {
             currentStep++;
 
-            // Slayder mərhələsinin idarə olunması
-            if (currentStep < steps.length && steps[currentStep].showSlider) {
-                sliderContainer.style.display = 'block';
-            } else {
+            // İlk addımda (slayder bitəndə) düymə mətnini dəyişirik
+            if (currentStep === 0) {
                 sliderContainer.style.display = 'none';
+                yesBtn.innerText = "Hə düzdür";
             }
 
             if (currentStep < steps.length) {
                 questionTxt.innerText = steps[currentStep].question;
                 emojiTxt.innerText = steps[currentStep].emoji;
                 
-                // "Yox" düyməsini sıfırlayıb yerinə qaytarırıq
+                // "Yox" düyməsini görünən edirik və yerini sıfırlayırıq
+                if(steps[currentStep].showNoBtn) {
+                    noBtn.style.display = 'block';
+                }
                 noScale = 1;
                 noBtn.style.position = 'absolute';
                 noBtn.style.left = '55%';
                 noBtn.style.top = 'auto';
                 noBtn.style.transform = 'scale(1)';
 
-                confetti({ particleCount: 30, spread: 40, origin: { y: 0.8 } });
+                confetti({ particleCount: 25, spread: 35, origin: { y: 0.8 } });
             } else {
-                // Final Ekranı
+                // Final Mərhələsi
                 const finalAmount = moneySlider.value;
                 questionTxt.innerHTML = `Mənim xeyirxah, ürəyi yumşaq anam! <br> <span style="color:#2ecc71;">${finalAmount} AZN</span>-lik transfer təsdiqləndi! 😂❤️🎉`;
                 emojiTxt.innerText = "💌💸💎";
@@ -278,11 +285,10 @@
                 yesBtn.style.display = 'none';
                 noBtn.style.display = 'none';
                 
-                // Kart panelini və kopyalama düyməsini aktivləşdir
                 cardContainer.style.display = 'block';
                 copyBtn.style.display = 'block';
 
-                // Böyük konfeti şousu
+                // Böyük konfeti effekti
                 var duration = 2.5 * 1000;
                 var end = Date.now() + duration;
                 (function frame() {
@@ -293,7 +299,7 @@
             }
         });
 
-        // Kart Kopyalama Funksiyası
+        // Kopyalama paneli
         copyBtn.addEventListener('click', () => {
             const textToCopy = cardNumber.innerText;
             navigator.clipboard.writeText(textToCopy).then(() => {
