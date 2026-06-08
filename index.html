@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anama Kiçik Bir Sürpriz ❤️</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fff1f1, #ffd3d3);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 35px 25px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(214, 48, 49, 0.15);
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        .emoji {
+            font-size: 60px;
+            margin-bottom: 15px;
+            display: block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        h2 {
+            color: #2d3436;
+            font-size: 22px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 35px;
+            min-height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            height: 60px;
+            position: relative;
+            width: 100%;
+        }
+
+        button {
+            padding: 14px 0;
+            width: 120px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .btn-yes {
+            background-color: #2ecc71;
+            color: white;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        .btn-yes:active {
+            transform: scale(0.92);
+            background-color: #27ae60;
+        }
+
+        .btn-no {
+            background-color: #dfe6e9;
+            color: #636e72;
+            position: absolute;
+            left: 55%;
+            transition: background-color 0.2s;
+            will-change: top, left;
+            touch-action: none; /* Telefonda default toxunma hərəkətlərini bloklayır */
+        }
+
+        /* Mobil telefonlar üçün xüsusi tənzimləmə */
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 19px;
+            }
+            button {
+                width: 100px;
+                padding: 12px 0;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <span class="emoji" id="emoji">✨❤️✨</span>
+        <h2 id="question">Canım anam, bilirsən də səni nə qədər çox istəyirəm? 🥰</h2>
+        <div class="btn-container">
+            <button class="btn-yes" id="yesBtn">Hə mən də</button>
+            <button class="btn-no" id="noBtn">Yox</button>
+        </div>
+    </div>
+
+    <script>
+        // Səmimi və insanca yazılmış dialoq addımları
+        const steps = [
+            { question: "Canım anam, bilirsən də səni nə qədər çox istəyirəm? 🥰", emoji: "✨❤️✨" },
+            { question: "Yaxşı ki varsan, yoxsa bu sayti hazirlamaq ucun mene komputeri kim alardi 🥺", emoji: "🧸" },
+            { question: "Həm də qəbul edək ki, evin ən ağıllı, en gicide menem duzdu? 😇", emoji: "👑" },
+            { question: "Bura qədər hər şey əla! bes mene 20 manat, xırda bir pul verərsən? 💵👉👈", emoji: "💸" },
+            { question: "Bax daxildən gələn o analıq səsin deyir ki, 'Hə verərəm', düz tapdım? 😂", emoji: "🤔" },
+            { question: "Əla! Deməli razılaşdıq? Nağd yoxsa karta atırsan? 🤑💰", emoji: "🥳" }
+        ];
+
+        let currentStep = 0;
+
+        const questionTxt = document.getElementById('question');
+        const emojiTxt = document.getElementById('emoji');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+
+        // "Yox" düyməsini qaçıran funksiya
+        function moveNoButton(e) {
+            if (e) e.preventDefault();
+
+            const padding = 30;
+            // Düymənin ekranın xaricinə çıxmaması üçün ölçüləri hesablayırıq
+            const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+            const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+
+            // Tamamilə təsadüfi yeni koordinat yaradırıq
+            const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+        }
+
+        // Həm PC (mouseover) həm Mobil (touchstart, mousedown) üçün keçərlidir
+        noBtn.addEventListener('mouseover', moveNoButton);
+        noBtn.addEventListener('touchstart', moveNoButton, { passive: false });
+        noBtn.addEventListener('mousedown', moveNoButton);
+
+        // "Hə" düyməsinə klikləyəndə
+        yesBtn.addEventListener('click', () => {
+            currentStep++;
+
+            if (currentStep < steps.length) {
+                // Növbəti yazıya keçid
+                questionTxt.innerText = steps[currentStep].question;
+                emojiTxt.innerText = steps[currentStep].emoji;
+                
+                // "Yox" düyməsini hər dəfə mərkəzə yaxın qaytarırıq ki, ana çaşmasın
+                noBtn.style.position = 'absolute';
+                noBtn.style.left = '55%';
+                noBtn.style.top = 'auto';
+            } else {
+                // Sonluq
+                questionTxt.innerHTML = "Dunyanin En gozel Anasi Sensen! <br> Razılaşdıq, ödəniş gözlənilir! Öpürəm çox! 😂❤️🎉";
+                emojiTxt.innerText = "🚀💵💖";
+                yesBtn.style.display = 'none';
+                noBtn.style.display = 'none';
+            }
+        });
+    </script>
+
+</body>
+</html>
