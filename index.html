@@ -32,7 +32,7 @@
             border-radius: 24px;
             box-shadow: 0 15px 35px rgba(214, 48, 49, 0.15);
             text-align: center;
-            max-width: 420px;
+            max-width: 440px;
             width: 100%;
             transition: all 0.3s ease;
             position: relative;
@@ -84,10 +84,24 @@
         }
 
         .slider-container {
-            display: block; /* İlk başda görünür */
+            display: block;
         }
 
         .card-container {
+            display: none;
+            padding: 10px;
+            background: #fff;
+            border: none;
+        }
+
+        /* Finalda çıxacaq böyük şəkil stili */
+        .final-img {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
             display: none;
         }
 
@@ -107,14 +121,16 @@
 
         .card-number {
             font-family: monospace;
-            font-size: 18px;
+            font-size: 20px;
+            font-weight: bold;
             letter-spacing: 2px;
             background: #f1f2f6;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             color: #2d3436;
+            border: 2px solid #dfe6e9;
         }
 
         .btn-container {
@@ -152,42 +168,49 @@
             position: absolute;
             left: 55%;
             touch-action: none;
-            display: none; /* İlk mərhələdə "Yox" düyməsi gizlidir, suallarda çıxacaq */
+            display: none;
         }
 
         .btn-copy {
             background-color: #3498db;
             color: white;
-            width: 80%;
+            width: 85%;
             margin: 0 auto;
             display: none;
+            border-radius: 12px;
         }
 
         @media (max-width: 480px) {
             h2 { font-size: 18px; }
             button { width: 105px; font-size: 15px; }
+            .final-img { max-height: 220px; }
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <img src="images/img45.jpeg" alt="Anam və mən" class="profile-img">
+        <!-- Giriş və sual şəkli -->
+        <img src="images/img45.jpeg" alt="Anam və mən" class="profile-img" id="mainImg">
+        
+        <!-- Finalda çıxacaq böyük şəkil (ilkin olaraq gizlidir) -->
+        <img src="images/img46.jpeg" alt="Sürpriz" class="final-img" id="finalImg">
+
         <span class="emoji" id="emoji">📊💸</span>
         <h2 id="question">Canım anam, ilk öncə könlündən qopan cib xərcliyini seç görək... 🥰</h2>
         
-        <!-- Slayder Bölməsi (Ən Başda) -->
+        <!-- Slayder Bölməsi -->
         <div class="slider-container" id="sliderContainer">
             <p style="font-size: 14px; color: #636e72;">Məbləğ (Yalnız artırmaq olar, aşağı düşmür 😜):</p>
             <input type="range" id="moneySlider" min="20" max="100" value="20" step="5">
             <span class="slider-label" id="sliderValue">20 AZN</span>
         </div>
 
-        <!-- Gizli Kart Kopyalama Bölməsi (Ən Sonda) -->
+        <!-- Kart Kopyalama Bölməsi -->
         <div class="card-container" id="cardContainer">
             <!-- Bura öz real kart nömrəni yaza bilərsən -->
             <span class="card-number" id="cardNumber">4098 5844 5022 1112</span>
-            <p id="copyStatus" style="font-size: 12px; color: #2ecc71; font-weight: bold; min-height: 18px;"></p>
+            <p id="copyStatus" style="font-size: 13px; color: #2ecc71; font-weight: bold; min-height: 18px; margin-top: 5px;"></p>
         </div>
 
         <div class="btn-container">
@@ -198,7 +221,6 @@
     </div>
 
     <script>
-        // Suallar artıq slayderdən SONRA başlayır
         const steps = [
             { question: "Canım anam, bu dünyada məni hamıdan çox istəyən sənSƏN, düzdür? 🥰", emoji: "👩‍👦❤️", showNoBtn: true },
             { question: "Gecələr oyaq qalıb, mənə min bir zəhmətlə baxmısan, haqqın ödənməz... 🥺", emoji: "✨🙏✨", showNoBtn: true },
@@ -207,9 +229,11 @@
             { question: "Ay canım mənim! Razılaşdıq o zaman, transferi təsdiqləyirik? 🥳💰", emoji: "🚀🛍️", showNoBtn: true }
         ];
 
-        let currentStep = -1; // -1 slayder mərhələsini bildirir
+        let currentStep = -1; 
         let noScale = 1;
 
+        const mainImg = document.getElementById('mainImg');
+        const finalImg = document.getElementById('finalImg');
         const questionTxt = document.getElementById('question');
         const emojiTxt = document.getElementById('emoji');
         const yesBtn = document.getElementById('yesBtn');
@@ -222,13 +246,11 @@
         const cardNumber = document.getElementById('cardNumber');
         const copyStatus = document.getElementById('copyStatus');
 
-        // Slayder tənzimləməsi
         moneySlider.addEventListener('input', (e) => {
             if(e.target.value < 20) e.target.value = 20;
             sliderValue.innerText = e.target.value + " AZN";
         });
 
-        // "Yox" düyməsini qaçıran və kiçildən funksiya
         function moveNoButton(e) {
             if (e) e.preventDefault();
 
@@ -251,11 +273,9 @@
         noBtn.addEventListener('touchstart', moveNoButton, { passive: false });
         noBtn.addEventListener('mousedown', moveNoButton);
 
-        // "Hə" və ya "İrəli" düyməsi
         yesBtn.addEventListener('click', () => {
             currentStep++;
 
-            // İlk addımda (slayder bitəndə) düymə mətnini dəyişirik
             if (currentStep === 0) {
                 sliderContainer.style.display = 'none';
                 yesBtn.innerText = "Hə düzdür";
@@ -265,7 +285,6 @@
                 questionTxt.innerText = steps[currentStep].question;
                 emojiTxt.innerText = steps[currentStep].emoji;
                 
-                // "Yox" düyməsini görünən edirik və yerini sıfırlayırıq
                 if(steps[currentStep].showNoBtn) {
                     noBtn.style.display = 'block';
                 }
@@ -277,36 +296,40 @@
 
                 confetti({ particleCount: 25, spread: 35, origin: { y: 0.8 } });
             } else {
-                // Final Mərhələsi
+                // FİNAL MƏRHƏLƏSİ
                 const finalAmount = moneySlider.value;
-                questionTxt.innerHTML = `Mənim xeyirxah, ürəyi yumşaq anam! <br> <span style="color:#2ecc71;">${finalAmount} AZN</span>-lik transfer təsdiqləndi! 😂❤️🎉`;
-                emojiTxt.innerText = "💌💸💎";
+                questionTxt.innerHTML = `Mənim xeyirxah, ürəyi yumşaq anam! <br> <span style="color:#2ecc71;">${finalAmount} AZN</span> göndərişini gözləyirəm! 😂❤️`;
+                emojiTxt.style.display = 'none'; // Emojini gizlədirik ki, şəkilə yer qalsın
+                
+                // Köhnə girdə şəkli gizlət, yeni BÖYÜK şəkli göstər
+                mainImg.style.display = 'none';
+                finalImg.style.display = 'block';
                 
                 yesBtn.style.display = 'none';
                 noBtn.style.display = 'none';
                 
+                // Kart nömrəsi panelini və kopyalama düyməsini aç
                 cardContainer.style.display = 'block';
                 copyBtn.style.display = 'block';
 
-                // Böyük konfeti effekti
-                var duration = 2.5 * 1000;
+                // Dayanmadan yağan möhtəşəm konfeti yağışı
+                var duration = 3 * 1000;
                 var end = Date.now() + duration;
                 (function frame() {
-                    confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 } });
-                    confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 } });
+                    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+                    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
                     if (Date.now() < end) { requestAnimationFrame(frame); }
                 }());
             }
         });
 
-        // Kopyalama paneli
         copyBtn.addEventListener('click', () => {
             const textToCopy = cardNumber.innerText;
             navigator.clipboard.writeText(textToCopy).then(() => {
-                copyStatus.innerText = "📋 Kart nömrəsi uğurla kopyalandı! İndi mənə göndərə bilərsən 😉";
-                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+                copyStatus.innerText = "📋 Kopyalandı! İndi mənə ata bilərsən 😉";
+                confetti({ particleCount: 40, spread: 50, origin: { y: 0.8 } });
             }).catch(() => {
-                copyStatus.innerText = "Xəta baş verdi, nömrəni özün yazarsan 😂";
+                copyStatus.innerText = "Xəta oldu, nömrəni skrinşot etsən də olar 😂";
             });
         });
     </script>
